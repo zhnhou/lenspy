@@ -1,3 +1,3 @@
 # lenspy
 
-This is a test readme.
+Some packages in this repo are not my invention.
