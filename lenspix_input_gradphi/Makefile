@@ -3,8 +3,11 @@ CFITSIO = $(HOME)/Projects/CMBtools/cfitsio/cfitsio_$(ENV_HOSTNAME)
 
 #default settings for ifort
 
-#F90C     = ftn
-F90C    = mpif90
+ifeq "$(ENV_HOSTNAME)" "cori"
+F90C = ftn
+else
+F90C = mpif90
+endif
 
 healpix = $(HEALPIX)
 LAPACKL = -mkl -lhealpix -openmp

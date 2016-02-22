@@ -1024,7 +1024,35 @@
         end do
     end if
 
-    end  subroutine HealpixMap_AddUncorrelatedNoise
+    end subroutine HealpixMap_AddUncorrelatedNoise
+
+    !! ZH add on !!
+    subroutine PhiAlm_Read(A, fname, lmax)
+    type(healpixalm)    :: A
+    character(*)        :: fname
+    integer, intent(in) :: lmax
+
+    character(len=80) header(80,3)
+
+    integer i, nalm
+    real, allocatable :: alms(:,:,:)
+
+    write(*,*) "Reading Phi alms - "
+    write(*,*) trim(adjustl(fname))
+
+    nalm = (lmax+1)*(lmax+2)/2
+    allocate(alms(1:nalm,1:(3+1),1:1))
+    call fits2alms(fname, nalm, alms, 3, header, 80, 1)
+
+    do i=1, nalm
+        A%Phi(1,nint(alms(i,1,1)),nint(alms(i,2,1))) = cmplx(alms(i,3,1),alms(i,4,1))
+    enddo
+
+    write(*,*) "Phi reading finished"
+    deallocate(alms)
+
+    return
+    end subroutine
 
     !! ZH modify on !!
     !!subroutine HealpixAlm_Sim(A, P, seed, HasPhi, dopol,DoT)
