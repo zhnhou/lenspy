@@ -21,10 +21,10 @@
     character(LEN=1024)  :: w8name = '../Healpix_2.00/data/'
     character(LEN=1024)  :: file_stem, cls_file, out_file_root, cls_lensed_file
     !! ZH add on !!
-    logical :: input_gradphi, random_phi, output_unlensed
+    logical :: input_gradphi, random_phi, output_unlensed, input_phialm
     integer :: file_unit
     integer(I_NPIX) :: ipix
-    character(LEN=1024)  :: GradPhi_file
+    character(LEN=1024)  :: GradPhi_file, PhiAlm_file
     character(LEN=256)   :: out_file_suffix
     complex(SPC), allocatable :: map_gradphi(:)
     !! ZH add off !!
@@ -60,10 +60,21 @@
     !! ZH add on !!
     out_file_suffix    = Ini_Read_String('out_file_suffix')
     input_gradphi = Ini_Read_Logical('input_gradphi', .false.)
+    input_phialm  = Ini_Read_Logical('input_PhiAlm', .false.)
     random_phi    = Ini_Read_Logical('random_phi', .true.)
     output_unlensed = Ini_Read_Logical('output_unlensed', .false.)
+
+    if (input_phialm .and. input_gradphi) then
+        write(*,*) "PhiAlm or GradPhi, choose only one."
+        stop
+    endif
+
     if (input_gradphi) then
         GradPhi_file = Ini_Read_String('GradPhi_file')
+    endif
+
+    if (input_phialm) then
+        PhiAlm_file = Ini_Read_String('PhiAlm_file')
     endif
     !! ZH add off !!
 

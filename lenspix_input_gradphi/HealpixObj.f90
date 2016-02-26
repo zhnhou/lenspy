@@ -1056,7 +1056,7 @@
 
     !! ZH modify on !!
     !!subroutine HealpixAlm_Sim(A, P, seed, HasPhi, dopol,DoT)
-    subroutine HealpixAlm_Sim(A, P, seed, HasPhi, dopol,DoT, random_phi)
+    subroutine HealpixAlm_Sim(A, P, seed, HasPhi, dopol,DoT, random_phi, phialm_file)
     !! ZH modify off !!
     use random
     use alm_tools
@@ -1067,6 +1067,7 @@
     logical, intent(in), optional :: HasPhi,dopol,DoT
     !! ZH add on !!
     logical, intent(in), optional :: random_phi
+    character(*), intent(in), optional :: phialm_file
     !! ZH add off !!
     integer l,m
     logical wantphi
