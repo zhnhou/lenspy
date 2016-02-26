@@ -1205,6 +1205,8 @@
             write(*,*) "Overwriting the option random_phi, using the input PhiAlm"
             wantphi = .false.
         endif
+
+        return
     endif
 
     if (present(random_phi) .and. .not. random_phi) then
