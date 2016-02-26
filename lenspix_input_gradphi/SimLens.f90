@@ -141,14 +141,19 @@
 
         !! ZH modify on !!
         !!call HealpixAlm_Sim(A, P, rand_seed,HasPhi=.true., dopol = want_pol)
-        call HealpixAlm_Sim(A, P, rand_seed, HasPhi=.true., dopol=want_pol, random_phi=random_phi)
+        if (input_phialm) then
+            call HealpixAlm_Sim(A, P, rand_seed, HasPhi=.true., dopol=want_pol, random_phi=random_phi, phialm_file=trim(PhiAlm_file))
+        else
+            call HealpixAlm_Sim(A, P, rand_seed, HasPhi=.true., dopol=want_pol, random_phi=random_phi)
+        endif
         !! ZH modify off !!
+
         call HealpixAlm2Power(A,P)
         call HealpixPower_Write(P,trim(file_stem)//'_unlensed_simulated.dat')
 
         !! ZH add on !!
         if (output_unlensed .or. output_phimap) then
-            call HealpixAlm2Map(H, A, Z, npix, DoPhi=.false.)
+            call HealpixAlm2Map(H, A, Z, npix, DoPhi=.true.)
             if (output_unlensed) &
             call HealpixMap_Write(Z, trim(file_stem)//'_unlensed_map.fits', overwrite=.true.)
 
@@ -169,16 +174,18 @@
         !! ZH modify off !!
     
         !! ZH modify on !!
-        allocate(map_gradphi(0:npix-1))
-        open(newunit=file_unit, file=trim(gradphi_file), form='binary', status='old', action='read')
-        read(file_unit) map_gradphi
-        close(file_unit)
+        if (input_gradphi) then
+            allocate(map_gradphi(0:npix-1))
+            open(newunit=file_unit, file=trim(gradphi_file), form='binary', status='old', action='read')
+            read(file_unit) map_gradphi
+            close(file_unit)
 
-        do ipix=0, npix-1
-            GradPhi%SpinField(ipix) = GradPhi%SpinField(ipix) + map_gradphi(ipix)
-        enddo
+            do ipix=0, npix-1
+                GradPhi%SpinField(ipix) = GradPhi%SpinField(ipix) + map_gradphi(ipix)
+            enddo
 
-        deallocate(map_gradphi)
+            deallocate(map_gradphi)
+        endif
 
         !open(newunit=file_unit, file=trim(file_stem)//'_GradPhi.bin', form='binary', status='unknown')
         !write(file_unit) GradPhi%SpinField
