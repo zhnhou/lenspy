@@ -34,6 +34,9 @@
     integer :: lens_method = lens_interp
     integer :: mpi_division_method = division_equalrows
     integer ::  interp_method,  rand_seed
+    !! ZH add on !!
+    integer :: seed1, seed2
+    !! ZH add off !!
     logical :: err, want_pol
     real :: interp_factor
     integer status
@@ -82,7 +85,13 @@
 
     lens_method = Ini_Read_Int('lens_method')
     want_pol = Ini_Read_Logical('want_pol')
-    rand_seed = Ini_Read_Int('rand_seed')
+
+    !! ZH modify on !!
+    !!rand_seed = Ini_Read_Int('rand_seed')
+    rand_seed = Ini_Read_Int('rand_seed', -1)
+    seed1 = Ini_Read_Int('rand_seed1', rand_seed)
+    seed2 = Ini_Read_Int('rand_seed2', 9373)
+    !! ZH modify off !!
 
     interp_method = Ini_read_int('interp_method')
 
@@ -142,9 +151,9 @@
         !! ZH modify on !!
         !!call HealpixAlm_Sim(A, P, rand_seed,HasPhi=.true., dopol = want_pol)
         if (input_phialm) then
-            call HealpixAlm_Sim(A, P, rand_seed, HasPhi=.true., dopol=want_pol, random_phi=random_phi, phialm_file=trim(PhiAlm_file))
+            call HealpixAlm_Sim(A, P, seed1=seed1, seed2=seed2, HasPhi=.true., dopol=want_pol, random_phi=random_phi, phialm_file=trim(PhiAlm_file))
         else
-            call HealpixAlm_Sim(A, P, rand_seed, HasPhi=.true., dopol=want_pol, random_phi=random_phi)
+            call HealpixAlm_Sim(A, P, seed1=seed1, seed2=seed2, HasPhi=.true., dopol=want_pol, random_phi=random_phi)
         endif
         !! ZH modify off !!
 

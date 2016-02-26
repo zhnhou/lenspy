@@ -1111,14 +1111,17 @@
 
     !! ZH modify on !!
     !!subroutine HealpixAlm_Sim(A, P, seed, HasPhi, dopol,DoT)
-    subroutine HealpixAlm_Sim(A, P, seed, HasPhi, dopol,DoT, random_phi, phialm_file)
+    subroutine HealpixAlm_Sim(A, P, seed1, seed2, HasPhi, dopol,DoT, random_phi, phialm_file)
     !! ZH modify off !!
     use random
     use alm_tools
     use ran_tools
     Type(HealpixAlm) :: A
     Type(HealpixPower) :: P
-    integer, intent(in), optional :: seed
+    !! ZH modify on !!
+    !!integer, intent(in), optional :: seed
+    integer, intent(in), optional :: seed1, seed2
+    !! ZH modify off !!
     logical, intent(in), optional :: HasPhi,dopol,DoT
     !! ZH add on !!
     logical, intent(in), optional :: random_phi
@@ -1130,8 +1133,16 @@
     real(sp) xamp, corr, tamp, Bamp, Examp, sqrt2
     complex(sp) g
 
-    if (present(seed)) then
-        call InitRandom(seed)
+    !! ZH modify on !!
+    !!if (present(seed)) then
+    !!    call InitRandom(seed)
+    if (present(seed1) .and. present(seed2)) then
+        call InitRandom(seed1, seed2)
+    else if (present(seed1)) then
+        call InitRandom(seed1)
+    else if (present(seed2)) then
+        call InitRandom(-1, seed2)
+    !! ZH modify off !!
     else
         if (.not. RandInited) call InitRandom
         RandInited = .true.
