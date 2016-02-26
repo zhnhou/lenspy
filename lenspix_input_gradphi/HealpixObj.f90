@@ -3,7 +3,7 @@
     USE head_fits, ONLY : add_card, get_card
     USE pix_tools, ONLY :  npix2nside, nside2npix, query_disc
     USE fitstools, ONLY : getsize_fits, input_map, read_par, read_dbintab, write_asctab, &
-    dump_alms,write_bintab, fits2alms
+    dump_alms,write_bintab, fits2alms, number_of_alms
     USE spinalm_tools
     use AMLutils
     implicit none
@@ -1059,6 +1059,56 @@
     return
     end subroutine
 
+    !! borrowed van Engelen's piece of code !!
+    subroutine PhiMap_Write(M, fname, overwrite)
+    Type(HealpixMap), intent(in) :: M
+    character(LEN=*), intent(in) :: fname
+    logical, intent(in), optional :: overwrite
+    CHARACTER(LEN=80), DIMENSION(1:120) :: header
+    integer nlheader
+    integer status
+
+    !van Engelen doing all this
+    !Since the write_bintab expects a 
+    REAL(SP), DIMENSION(:,:), allocatable :: Phi_dummy
+    ALLOCATE(Phi_dummy(0:M%npix-1,1),stat = status)
+    if (status /=0) call MpiStop('HealpixMap_AllocatePhi: allocate')
+
+    Phi_dummy(0:M%npix-1, 1) = M%Phi
+
+    if (present(overwrite)) then
+       if (overwrite) call DeleteFile(fname)
+    else
+       if (FileExists(fname)) call MpiStop('HealpixMap_Write: file already exists - '//trim(fname))
+    end if
+
+    header = ' '
+    call add_card(header,'COMMENT','-----------------------------------------------')
+    call add_card(header,'COMMENT','     Sky Map Pixelisation Specific Keywords    ')
+    call add_card(header,'COMMENT','-----------------------------------------------')
+    call add_card(header,'PIXTYPE','HEALPIX','HEALPIX Pixelisation')
+    if (M%ordering == ord_ring) then
+       call add_card(header,'ORDERING','RING',  'Pixel ordering scheme, either RING or NESTED')
+    else
+       call add_card(header,'ORDERING','NESTED',  'Pixel ordering scheme, either RING or NESTED')
+    endif
+    call add_card(header,'NSIDE'   ,M%nside,   'Resolution parameter for HEALPIX')
+    call add_card(header,'FIRSTPIX',0,'First pixel # (0 based)')
+    call add_card(header,'LASTPIX',M%npix-1,'Last pixel # (0 based)')
+    call add_card(header) ! blank line
+    call add_card(header,'CREATOR','HEALPixObj',        'Software creating the FITS file')
+    call add_card(header,'INDXSCHM','IMPLICIT',' Indexing : IMPLICIT or EXPLICIT')
+    call add_card(header,'GRAIN', 0, ' Grain of pixel indexing') ! full sky
+
+    call add_card(header,"COMMENT","*************************************")
+
+    nlheader = SIZE(header)
+
+    call write_bintab(Phi_dummy, M%npix, 1, header, nlheader, fname)
+
+    end subroutine PhiMap_Write
+    !! ZH add off !!
+
     !! ZH modify on !!
     !!subroutine HealpixAlm_Sim(A, P, seed, HasPhi, dopol,DoT)
     subroutine HealpixAlm_Sim(A, P, seed, HasPhi, dopol,DoT, random_phi, phialm_file)
@@ -1166,6 +1216,9 @@
 
     if (wantphi) then
         !Make phi with correct correlation to T and E, AL May 2010
+        !! ZH add on !!
+        write(*,*) "generating random phi alm"
+        !! ZH add off !!
         do l=1, P%lmax
             if (wantpol==0) then
                 A%Phi(1,l,0) =Gaussian1()* sqrt(P%PhiCl(l,1))
