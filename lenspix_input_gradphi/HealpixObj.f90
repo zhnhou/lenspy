@@ -1041,8 +1041,13 @@
     write(*,*) trim(adjustl(fname))
 
     nalm = (lmax+1)*(lmax+2)/2
+    if (nalm .ne. number_of_alms(trim(fname))) then
+        write(*,*) "The size of alm in file does not match."
+        stop
+    endif
+
     allocate(alms(1:nalm,1:(3+1),1:1))
-    call fits2alms(fname, nalm, alms, 3, header, 80, 1)
+    call fits2alms(trim(fname), nalm, alms, 3, header, 80, 1)
 
     do i=1, nalm
         A%Phi(1,nint(alms(i,1,1)),nint(alms(i,2,1))) = cmplx(alms(i,3,1),alms(i,4,1))
@@ -1143,6 +1148,15 @@
     end if
 
     !! ZH add on !!
+    if (present(phialm_file)) then
+        call PhiAlm_Read(A, trim(phialm_file), P%lmax)
+
+        if (present(random_phi) .and. random_phi) then
+            write(*,*) "Overwriting the option random_phi, using the input PhiAlm"
+            wantphi = .false.
+        endif
+    endif
+
     if (present(random_phi) .and. .not. random_phi) then
         wantphi = .false.
         A%Phi=0
