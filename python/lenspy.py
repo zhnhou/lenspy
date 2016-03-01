@@ -9,3 +9,4 @@ class setup_lenspix_run(object):
         self.workspace = workspace
         self.cls_file  = Cls_file
         self.nside     = nside
+        self.lmax      = lmax
