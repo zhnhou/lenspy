@@ -23,6 +23,7 @@
     !! ZH add on !!
     logical :: input_gradphi, random_phi, output_unlensed, input_phialm
     logical :: output_phimap
+    logical :: output_alm_unlensed, output_alm_lensed
     integer :: file_unit
     integer(I_NPIX) :: ipix
     character(LEN=1024)  :: GradPhi_file, PhiAlm_file
@@ -68,6 +69,9 @@
     random_phi    = Ini_Read_Logical('random_phi', .true.)
     output_unlensed = Ini_Read_Logical('output_unlensed', .false.)
     output_phimap = Ini_Read_Logical('output_phimap', .false.)
+
+    output_alm_unlensed = Ini_Read_Logical('output_alm_unlensed', .false.)
+    output_alm_lensed = Ini_Read_Logical('output_alm_lensed', .false.)
 
     if (input_phialm .and. input_gradphi) then
         write(*,*) "PhiAlm or GradPhi, choose only one."
@@ -161,7 +165,7 @@
         call HealpixPower_Write(P,trim(file_stem)//'_unlensed_simulated.dat')
 
         !! ZH add on !!
-        if (output_unlensed .or. output_phimap) then
+        if (output_unlensed .or. output_phimap .or. output_alm_unlensed) then
             call HealpixAlm2Map(H, A, Z, npix, DoPhi=.true.)
             if (output_unlensed) &
             call HealpixMap_Write(Z, trim(file_stem)//'_unlensed_map.fits', overwrite=.true.)
