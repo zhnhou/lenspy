@@ -10,3 +10,5 @@ class setup_lenspix_run(object):
         self.cls_file  = Cls_file
         self.nside     = nside
         self.lmax      = lmax
+        self.nsims     = nsims
+        self.output_prefix = output_prefix
