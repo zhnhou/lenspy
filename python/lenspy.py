@@ -58,14 +58,14 @@ class setup_lenspix_run(object):
         if (istart is None):
             istart = 0
         if (iend is None):
-            iend = self.nsims
+            iend = self.nsims-1
         
-        ini_path = self.workspace+'/'+self.run_name+'/params_ini/'
-        if not os.path.exists(ini_path):
-            os.makedirs(ini_path)
+        self.ini_path = self.workspace+'/'+self.run_name+'/params_ini/'
+        if not os.path.exists(self.ini_path):
+            os.makedirs(self.ini_path)
 
-        for isim in np.arange(istart,iend):
-            ini_file = ini_path+'params_'+str(isim)+'.ini'
+        for isim in np.arange(istart,iend+1):
+            ini_file = self.ini_path+'params_'+str(isim)+'.ini'
             with open(ini_file, 'w') as ini:
                 ini.write('w8dir = '+self.home_path+'/Projects/CMBtools/healpix/Healpix_3.30_'+self.host_name+'/data/\n')
                 ini.write('nside = %d\n' % self.nside)
@@ -98,7 +98,27 @@ class setup_lenspix_run(object):
         if (istart is None):
             istart = 0
         if (iend is None):
-            iend = self.nsims
+            iend = self.nsims-1
 
-        batch_path = self.workspace+'/'
+        batch_path = self.workspace+'/'+self.run_name+'/submit_'+self.host_name+'/'
+        if not os.path.exists(batch_path):
+            os.makedirs(batch_path)
+
+        batch_file = batch_path+'submit_'+str(istart)+'to'+str(iend)+'.sh'
+        with open(batch_file, 'w') as sh:
+            sh.write('#!/bin/bash\n')
+            sh.write('#SBATCH --partition=regular\n')
+            sh.write('#SBATCH --account=mp107\n')
+            sh.write('#SBATCH --nodes=4\n')
+            sh.write('#SBATCH --ntasks=128\n')
+            sh.write('#SBATCH --ntasks-per-node=32\n')
+            sh.write('#SBATCH --job-name=lenspix\n')
+            sh.write('#SBATCH --time=24:00:00\n')
+            sh.write(' \n')
+
+            lenspix_bin = self.home_path+'/Projects/projects/lenspy/lenspix_input_gradphi/simlens'
+            for isim in np.arange(istart,iend+1):
+                ini_file = self.ini_path+'params_'+str(isim)+'.ini'
+                sh.write('srun -n 128 %s %s' % (lenspix_bin, ini_file))
+
 
