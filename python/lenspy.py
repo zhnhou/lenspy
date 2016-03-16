@@ -94,6 +94,21 @@ class setup_lenspix_run(object):
                 ini.write('output_unlensed = %s\n' % ('T' if self.output_unlensed else 'F'))
                 ini.write('output_phimap = %s\n' % ('T' if self.output_phimap else 'F'))
 
+                seed1 = (self.seed_init+isim)*5 # 30081
+                if (seed1 < 0 or seed1 > 30081):
+                    print "seed1 should be in (0, 30081)"
+                    exit()
+                ini.write('rand_seed = %d' % seed1)
+
+                if not (self.seed2_init is None):
+                    seed2 = (self.seed2_init+isim)*5 # 31328
+                    if (seed2 < 0 or seed2 > 31328):
+                        print "seed1 should be in (0, 31328)"
+                        exit()
+                    ini.write('rand_seed2 = %d' % seed2)
+                
+
+
     def create_batch(self, istart=None, iend=None):
         if (istart is None):
             istart = 0
