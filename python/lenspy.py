@@ -1,4 +1,5 @@
 import numpy as py
+import os
 
 __all__ = ['lenspy']
 
@@ -19,5 +20,24 @@ class setup_lenspix_run(object):
         self.output_unlensed = output_unlensed
         self.output_phimap = output_phimap
 
-    def create_ini(self):
+        self.home_path = os.getenv('HOME')
+        self.host_name = os.getenv('ENV_HOSTNAME')
+        self.run_name = 'nside_'+str(self.nside)+'_lmax_'+str(self.lmax)+
+        '_nsims_'+str(self.nsims)
+        if (self.has_pol):
+            self.run_name += '_pol'
+
+    def create_ini(self, istart=None, iend=None):
+        if (istart is None):
+            istart = 0
+        if (iend is None):
+            iend = self.nsims
+
+        os.mkdir('scripts/')
+
+        for isim in np.arange(istart,iend):
+            ini_file = 'scripts/'+self.run_name+'/params_'+str(isim)+'.ini'
+            with open(ini_file, 'w') as ini:
+                ini.write('w8dir = '+self.home+'/Projects/CMBtools/healpix/Healpix_3.30_'+self.host_name+'/data/')
+                ini.write('nside = %d')
 
