@@ -7,7 +7,7 @@ class setup_lenspix_run(object):
 
     def __init__(self, workspace, Cls_file=None, nsims=1, nside=8192, lmax=10000, output_root='lensed_cmb', 
                  lens_method=1, pol=False, seed_init=0, seed2_init=None, output_unlensed=False, output_phimap=False, 
-                 input_gradphi=False, input_phialm=False, gradphi_root=None, phialm_root=None):
+                 input_gradphi=False, input_phialm=False, gradphi_root=None, phialm_root=None, random_phi=True):
 
         self.home_path = os.getenv('HOME')
         self.host_name = os.getenv('ENV_HOSTNAME')
@@ -27,11 +27,20 @@ class setup_lenspix_run(object):
         self.seed1_init = seed_init
         self.seed2_init = seed2_init
 
+        self.random_phi = random_phi
         self.input_gradphi = input_gradphi
         self.input_phialm = input_phialm
 
         if (self.input_gradphi and self.input_phialm):
             print "Either gradphi or phialm should be input, not both"
+            exit()
+
+        if (self.input_gradphi and gradphi_root is None):
+            print "gradphi_root should be provided"
+            exit()
+
+        if (self.input_phialm and phialm_root is None):
+            print "phialm_root should be provided"
             exit()
 
         self.gradphi_root = gradphi_root
@@ -69,8 +78,27 @@ class setup_lenspix_run(object):
                 ini.write('interp_method = 1\n')
                 ini.write('mpi_division_method = 3\n')
                 ini.write('want_pol = %s\n' % ('T' if self.has_pol else 'F'))
+
+                ini.write('random_phi = %s\n' % ('T' if self.random_phi else 'F'))
                 ini.write('input_gradphi = %s\n' % ('T' if self.input_gradphi else 'F'))
                 ini.write('input_phialm = %s\n' % ('T' if self.input_phialm else 'F'))
-                if (self.input_gradphi):
-                    ini.write('GradPhi_file = %s\n')
+
+                if self.input_gradphi:
+                    gradphi_file = self.gradphi_root+'_sim_'+str(isim)+'.fits'
+                    ini.write('GradPhi_file = %s\n' % gradphi_file)
+
+                if self.input_phialm:
+                    phialm_file = self.phialm_root+'.bin'
+                    ini.write('PhiAlm_file = %s\n' % phialm_file)
+
+                ini.write('output_unlensed = %s\n' % ('T' if self.output_unlensed else 'F'))
+                ini.write('output_phimap = %s\n' % ('T' if self.output_phimap else 'F'))
+
+    def create_batch(self, istart=None, iend=None):
+        if (istart is None):
+            istart = 0
+        if (iend is None):
+            iend = self.nsims
+
+        batch_path = self.workspace+'/'
 
