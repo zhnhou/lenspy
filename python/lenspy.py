@@ -128,7 +128,7 @@ class setup_lenspix_run(object):
             sh.write('#SBATCH --ntasks=128\n')
             sh.write('#SBATCH --ntasks-per-node=32\n')
             sh.write('#SBATCH --job-name=lenspix\n')
-            sh.write('#SBATCH --time=24:00:00\n')
+            sh.write('#SBATCH --time=36:00:00\n')
             sh.write(' \n')
 
             lenspix_bin = self.home_path+'/Projects/projects/lenspy/lenspix_input_gradphi/simlens'
