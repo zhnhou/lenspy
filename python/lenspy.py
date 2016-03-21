@@ -5,7 +5,7 @@ __all__ = ['lenspy']
 
 class setup_lenspix_run(object):
 
-    def __init__(self, workspace, Cls_file=None, nsims=1, nside=8192, lmax=10000, output_root='lensed_cmb', 
+    def __init__(self, workspace, Cls_file=None, nsims=1, nside=8192, lmax=10000, output_file_root='lensed_cmb', 
                  lens_method=1, pol=False, seed_init=0, seed2_init=None, output_unlensed=False, output_phimap=False, 
                  input_gradphi=False, input_phialm=False, gradphi_root=None, phialm_root=None, random_phi=True):
 
@@ -21,7 +21,7 @@ class setup_lenspix_run(object):
         self.nsims     = nsims
         self.nside     = nside
         self.lmax      = lmax
-        self.output_root = output_root
+        self.output_file_root = output_file_root
         self.lens_method = lens_method
         self.has_pol = pol
         self.seed1_init = seed_init
@@ -59,6 +59,10 @@ class setup_lenspix_run(object):
             istart = 0
         if (iend is None):
             iend = self.nsims-1
+
+        self.output_path = self.workspace+'/'+self.run_name+'/output/'
+        if not os.path.exists(self.output_path):
+            os.makedirs(self.output_path)
         
         self.ini_path = self.workspace+'/'+self.run_name+'/params_ini/'
         if not os.path.exists(self.ini_path):
@@ -71,7 +75,7 @@ class setup_lenspix_run(object):
                 ini.write('nside = %d\n' % self.nside)
                 ini.write('lmax = %d\n' % self.lmax)
                 ini.write('cls_file = %s\n' % self.cls_file)
-                ini.write('out_file_root = %s\n' % self.output_root)
+                ini.write('out_file_root = %s\n' % self.workspace+'/'+self.run_name+'/output/'+self.output_file_root)
                 ini.write('out_file_suffix = sim_%d\n' % isim)
                 ini.write('lens_method = %d\n'% self.lens_method)
                 ini.write('interp_factor = %.4f\n' % (2048.0/self.nside*1.50))
@@ -88,24 +92,24 @@ class setup_lenspix_run(object):
                     ini.write('GradPhi_file = %s\n' % gradphi_file)
 
                 if self.input_phialm:
-                    phialm_file = self.phialm_root+'.bin'
+                    phialm_file = self.phialm_root+'_sim_'+str(isim)+'_phi_alms.fits'
                     ini.write('PhiAlm_file = %s\n' % phialm_file)
 
                 ini.write('output_unlensed = %s\n' % ('T' if self.output_unlensed else 'F'))
                 ini.write('output_phimap = %s\n' % ('T' if self.output_phimap else 'F'))
 
-                seed1 = (self.seed_init+isim)*5 # 30081
+                seed1 = (self.seed1_init+isim)*5 # 30081
                 if (seed1 < 0 or seed1 > 30081):
                     print "seed1 should be in (0, 30081)"
                     exit()
-                ini.write('rand_seed = %d' % seed1)
+                ini.write('rand_seed = %d\n' % seed1)
 
                 if not (self.seed2_init is None):
                     seed2 = (self.seed2_init+isim)*5 # 31328
                     if (seed2 < 0 or seed2 > 31328):
                         print "seed1 should be in (0, 31328)"
                         exit()
-                    ini.write('rand_seed2 = %d' % seed2)
+                    ini.write('rand_seed2 = %d\n' % seed2)
                 
 
 
