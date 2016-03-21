@@ -138,6 +138,6 @@ class setup_lenspix_run(object):
             lenspix_bin = self.home_path+'/Projects/projects/lenspy/lenspix_input_gradphi/simlens'
             for isim in np.arange(istart,iend+1):
                 ini_file = self.ini_path+'params_'+str(isim)+'.ini'
-                sh.write('srun -n 128 %s %s' % (lenspix_bin, ini_file))
+                sh.write('srun -n 128 %s %s\n' % (lenspix_bin, ini_file))
 
 
