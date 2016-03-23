@@ -68,6 +68,8 @@ class setup_lenspix_run(object):
         if not os.path.exists(self.ini_path):
             os.makedirs(self.ini_path)
 
+        self.out_file_root = self.workspace+self.run_name+'/output/'+self.output_file_root
+
         for isim in np.arange(istart,iend+1):
             ini_file = self.ini_path+'params_'+str(isim)+'.ini'
             with open(ini_file, 'w') as ini:
@@ -75,7 +77,7 @@ class setup_lenspix_run(object):
                 ini.write('nside = %d\n' % self.nside)
                 ini.write('lmax = %d\n' % self.lmax)
                 ini.write('cls_file = %s\n' % self.cls_file)
-                ini.write('out_file_root = %s\n' % self.workspace+'/'+self.run_name+'/output/'+self.output_file_root)
+                ini.write('out_file_root = %s\n' % self.out_file_root)
                 ini.write('out_file_suffix = sim_%d\n' % isim)
                 ini.write('lens_method = %d\n'% self.lens_method)
                 ini.write('interp_factor = %.4f\n' % (2048.0/self.nside*1.50))
