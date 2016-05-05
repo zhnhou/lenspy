@@ -17,6 +17,11 @@ class setup_lenspix_run(object):
         if (Cls_file is None):
             Cls_file = self.home_path+'/Projects/CMBtools/cosmologist.info/camb/output/base_plikHM_TT_lowTEB_lensing_lenspotentialCls.dat'
 
+        if (not os.path.isfile(Cls_file)):
+            print Cls_file
+            print "does not exist. stop!"
+            exit()
+
         self.cls_file  = Cls_file
         self.nsims     = nsims
         self.nside     = nside
