@@ -63,7 +63,7 @@ class setup_lenspix_run(object):
         if (istart is None):
             istart = 0
         if (iend is None):
-            iend = self.nsims-1
+            iend = istart+self.nsims-1
 
         self.output_path = self.workspace+'/'+self.run_name+'/output/'
         if not os.path.exists(self.output_path):
@@ -124,7 +124,7 @@ class setup_lenspix_run(object):
         if (istart is None):
             istart = 0
         if (iend is None):
-            iend = self.nsims-1
+            iend = istart+self.nsims-1
 
         batch_path = self.workspace+'/'+self.run_name+'/submit_'+self.host_name+'/'
         if not os.path.exists(batch_path):
@@ -133,11 +133,21 @@ class setup_lenspix_run(object):
         batch_file = batch_path+'submit_'+str(istart)+'to'+str(iend)+'.sh'
         with open(batch_file, 'w') as sh:
             sh.write('#!/bin/bash\n')
-            sh.write('#SBATCH --partition=regular\n')
-            sh.write('#SBATCH --account=mp107\n')
-            sh.write('#SBATCH --nodes=4\n')
-            sh.write('#SBATCH --ntasks=128\n')
-            sh.write('#SBATCH --ntasks-per-node=32\n')
+            
+            if (self.host_name == 'midway'):
+                sh.write('#SBATCH --partition=kicp\n')
+                sh.write('#SBATCH --account=kicp\n')
+                sh.write('#SBATCH --nodes=6\n')
+                sh.write('#SBATCH --ntasks=96\n')
+                sh.write('#SBATCH --ntasks-per-node=16\n')
+                sh.write('#SBATCH --exclusive')
+            else:
+                sh.write('#SBATCH --partition=regular\n')
+                sh.write('#SBATCH --account=mp107\n')
+                sh.write('#SBATCH --nodes=4\n')
+                sh.write('#SBATCH --ntasks=128\n')
+                sh.write('#SBATCH --ntasks-per-node=32\n')
+
             sh.write('#SBATCH --job-name=lenspix\n')
             sh.write('#SBATCH --time=36:00:00\n')
             sh.write(' \n')
@@ -145,6 +155,10 @@ class setup_lenspix_run(object):
             lenspix_bin = self.home_path+'/Projects/projects/lenspy/lenspix_input_gradphi/simlens'
             for isim in np.arange(istart,iend+1):
                 ini_file = self.ini_path+'params_'+str(isim)+'.ini'
-                sh.write('srun -n 128 %s %s\n' % (lenspix_bin, ini_file))
+
+                if (self.host_name == 'midway'):
+                    sh.write('mpiexec %s %s\n' % (lenspix_bin, ini_file))
+                else:
+                    sh.write('srun -n 128 %s %s\n' % (lenspix_bin, ini_file))
 
 
