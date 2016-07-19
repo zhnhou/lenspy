@@ -92,7 +92,7 @@ class setup_lenspix_run(object):
 
                 ini.write('random_phi = %s\n' % ('T' if self.random_phi else 'F'))
                 ini.write('input_gradphi = %s\n' % ('T' if self.input_gradphi else 'F'))
-                ini.write('input_phialm = %s\n' % ('T' if self.input_phialm else 'F'))
+                ini.write('input_PhiAlm = %s\n' % ('T' if self.input_phialm else 'F'))
 
                 if self.input_gradphi:
                     gradphi_file = self.gradphi_root+'_sim_'+str(isim)+'.fits'

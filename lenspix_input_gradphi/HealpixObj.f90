@@ -1222,7 +1222,7 @@
 
     if (present(random_phi) .and. .not. random_phi) then
         wantphi = .false.
-        A%Phi=0
+        !! A%Phi=0
         write(*,*) "Not generating random phi alm"
     endif
     !! ZH add off !!
